@@ -1164,3 +1164,12 @@ textarea {
     transform: translateY(0);
   }
 }
+/* Additional approved views of the same catalogue product. */
+.product-thumbnails { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+.product-thumbnails button { padding: 4px; border: 2px solid #d7dfe5; border-radius: 8px; background: #fff; cursor: pointer; }
+.product-thumbnails button[aria-pressed="true"] { border-color: #f36b21; }
+.product-thumbnails button:focus-visible { outline: 3px solid #144b70; outline-offset: 3px; }
+.product-thumbnails img { width: 80px; height: 80px; object-fit: contain; display: block; }
+
+.product-gallery > .product-photo { height: auto; }
+#detail .product-layout > div:nth-child(2) { position: static; }

@@ -1,8 +1,8 @@
 const supplies = (window.COMEIIN_PRODUCTS || []).map((product) => ({
   ...product,
   image: product.image || `${window.CW_STATIC || '/static/'}assets/products/${product.id}-generated-v2.webp`,
-  imageOrigin: 'AI-generated product image',
-  imageStatus: 'Generated catalogue photography; client approval pending',
+  imageOrigin: product.imageOrigin || 'AI-generated product image',
+  imageStatus: product.imageStatus || 'Generated catalogue photography; client approval pending',
 }));
 const $ = (s) => document.querySelector(s),
   escapeHTML = (value) =>
@@ -111,14 +111,25 @@ function render() {
     history.replaceState(null, '', url);
   }
 }
+function quoteUnit(p) {
+  return p.quoteUnit || (p.pack && p.pack.toLowerCase() !== 'each' ? 'box' : 'item');
+}
+function quoteUnitPlural(p) {
+  const unit = quoteUnit(p);
+  return unit === 'box' ? 'boxes' : unit + 's';
+}
+function productGallery(p) {
+  const views = p.gallery?.length ? p.gallery : [{ image: p.image, alt: p.name }];
+  return `<div class="product-gallery" data-product-gallery="${escapeHTML(p.id)}"><img class="product-photo" src="${escapeHTML(views[0].image)}" alt="${escapeHTML(views[0].alt || p.name)}" decoding="async" width="900" height="900">${views.length > 1 ? `<div class="product-thumbnails" aria-label="Product views">${views.map((view, index) => `<button type="button" data-gallery="${escapeHTML(p.id)}" data-view="${index}" aria-label="View ${index + 1}: ${escapeHTML(p.name)}" aria-pressed="${index === 0}"><img src="${escapeHTML(view.image)}" alt="" width="80" height="80" loading="lazy"></button>`).join('')}</div>` : ''}</div>`;
+}
 function detailsMarkup(p) {
-  return `<div class="product-layout"><div><img class="product-photo" src="${p.image}" alt="${p.imageOrigin === 'Client workbook image' ? 'Client-supplied' : 'Illustrative'} ${escapeHTML(p.name)}" decoding="async" fetchpriority="high" width="900" height="900"><p class="image-note">${p.imageOrigin === 'Client workbook image' ? 'Client-supplied product photo.' : 'Illustrative product image. Actual appearance may vary.'}</p></div><div><p class="eyebrow">${escapeHTML(p.category)}</p><h2>${escapeHTML(p.name)}</h2><p class="muted">${escapeHTML(p.description)}</p>${
+  return `<div class="product-layout"><div>${productGallery(p)}<p class="image-note">${p.imageOrigin === 'Client workbook image' ? 'Client-supplied product photo.' : 'Illustrative product image. Actual appearance may vary.'}</p></div><div><p class="eyebrow">${escapeHTML(p.category)}</p><h2>${escapeHTML(p.name)}</h2><p class="muted">${escapeHTML(p.description)}</p>${
     Object.keys(p.specs).length
       ? `<dl class="specs">${Object.entries(p.specs)
           .map(([k, v]) => `<div><dt>${escapeHTML(k)}</dt><dd>${escapeHTML(v)}</dd></div>`)
           .join('')}</dl>`
       : '<p class="muted">Tell us the product type, model, size and quantity required. Our team will confirm suitable options.</p>'
-  }<p class="availability">Availability: ${escapeHTML(p.availability)} · Request a quote</p>${p.variants.length ? `<label class="variant-label">Capacity<select id="variant-${p.id}" required><option value="">Choose a capacity</option>${p.variants.map((v) => `<option>${escapeHTML(v)}</option>`).join('')}</select></label>` : ''}<button class="button orange" data-detail-add="${p.id}">Add to quote +</button><p class="image-note">${p.pack ? 'Quote quantity is ' + (p.pack.toLowerCase() === 'each' ? 'per item.' : 'the number of boxes requested.') : 'Specify the required units or packs in your enquiry.'} Final specifications and availability are confirmed by Comeiin Works.</p></div></div>`;
+  }<p class="availability">Availability: ${escapeHTML(p.availability)} · Request a quote</p>${p.variants.length ? `<label class="variant-label">${escapeHTML(p.variantLabel || 'Capacity')}<select id="variant-${p.id}" required><option value="">Choose an option</option>${p.variants.map((v) => `<option>${escapeHTML(v)}</option>`).join('')}</select></label>` : ''}<button class="button orange" data-detail-add="${p.id}">Add to quote +</button><p class="image-note">Quote quantity is the number of ${escapeHTML(quoteUnitPlural(p))} requested. Final specifications and availability are confirmed by Comeiin Works.</p></div></div>`;
 }
 function add(id, variant = '') {
   const key = id + '|' + variant;
@@ -132,7 +143,7 @@ function quoteRows() {
     ? [...selected]
         .map(([key, item]) => {
           const p = supplies.find((p) => p.id === item.id);
-          return `<div class="quote-row"><strong>${escapeHTML(p.name)}${item.variant ? ' — ' + escapeHTML(item.variant) : ''}<small>${escapeHTML(p.pack || 'Specify units in requirements')}</small></strong><label>${p.pack && p.pack.toLowerCase() !== 'each' ? 'Boxes' : 'Qty'} <input type="number" min="1" max="9999" value="${item.quantity}" data-qty="${escapeHTML(key)}" aria-label="Quantity for ${escapeHTML(p.name)} ${escapeHTML(item.variant)}"></label><button data-remove="${escapeHTML(key)}">Remove</button></div>`;
+          return `<div class="quote-row"><strong>${escapeHTML(p.name)}${item.variant ? ' — ' + escapeHTML(item.variant) : ''}<small>${escapeHTML(p.pack || 'Specify units in requirements')}</small></strong><label>${escapeHTML(quoteUnitPlural(p))} <input type="number" min="1" max="9999" value="${item.quantity}" data-qty="${escapeHTML(key)}" aria-label="Quantity for ${escapeHTML(p.name)} ${escapeHTML(item.variant)}"></label><button data-remove="${escapeHTML(key)}">Remove</button></div>`;
         })
         .join('')
     : '<p class="muted">No items selected yet. Describe the products you need below.</p>';
@@ -140,6 +151,21 @@ function quoteRows() {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('button, a[data-detail]');
   if (!b) return;
+
+  if (b.dataset.gallery) {
+    const p = supplies.find(product => product.id === b.dataset.gallery);
+    const index = Number(b.dataset.view);
+    const view = p?.gallery?.[index];
+    const gallery = b.closest('[data-product-gallery]');
+    if (!view || !gallery) return;
+    const photo = gallery.querySelector('.product-photo');
+    photo.src = view.image;
+    photo.alt = view.alt || p.name;
+    gallery.querySelectorAll('[data-view]').forEach(button => {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.view) === index));
+    });
+    return;
+  }
 
   // Product detail → open modal
   if (b.dataset.detail) {
@@ -207,7 +233,7 @@ $('#quote-form').addEventListener('submit', (e) => {
   const items = [...selected.values()]
     .map((item) => {
       const p = supplies.find((p) => p.id === item.id);
-      return `${p.reference} — ${p.name}${item.variant ? ' (' + item.variant + ')' : ''} — ${item.quantity} ${p.pack && p.pack.toLowerCase() !== 'each' ? 'box(es), ' + p.pack : 'item(s) / units to confirm'}`;
+      return `${p.reference} — ${p.name}${item.variant ? ' (' + item.variant + ')' : ''} — ${item.quantity} ${quoteUnitPlural(p)}${p.pack ? ', ' + p.pack : ''}`;
     })
     .join('\n');
   const body = `Hello Comeiin Works,\n\nPlease assist with a quotation.\n\nName: ${data.get('name')}\nEmail: ${data.get('email')}\nOrganisation: ${data.get('company')}\n\n${items}\n\nAdditional requirements:\n${data.get('notes')}\n\nPlease confirm specifications, pricing and availability.`;

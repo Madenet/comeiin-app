@@ -19,3 +19,12 @@ Product images are illustrative except the client photo. Final specifications, m
 The quote list lasts for the current browser session and includes capacity choices and box quantities. Email submission opens a draft; it does not send an enquiry automatically. This remains a local preview with indexing disabled.
 
 Dynamic catalogue update: expandable category navigation, combined category/search/listing-type filters, alphabetical sorting and removable filter chips. Filter state is encoded in the catalogue URL. Quick view retains specifications and capacity selection. The quote drawer confirms additions and supports continuing browsing. Related items use explicit companion links first, then the same category. Subtle product reveals, hover transitions and panel animations respect reduced-motion preferences. No additional product, stock, pricing or image claims were introduced.
+
+
+Approved catalogue batch 01 (15 November 2026): 20 images now serve 17 individual
+listings, including 15 new entries and two replacements. The browser catalogue
+now has 37 entries. See docs/product-images/batch-01.txt for provenance, mapping,
+checks and the focused database import command. Batch images are approved;
+approval statuses for other images remain unchanged. catalogue.json is now the
+current source for the generated js/catalogue.js; run scripts/build_catalogue.py
+after changes. Additional views belong to individual products, not new SKUs.
