@@ -183,6 +183,8 @@ def run():
     print()
     print("=" * 60)
     print(f"DONE — {created} created, {updated} updated")
+    from django.core.management import call_command
+    call_command('apply_product_image_batch', 1)
     print(f"Total products now: {Product.objects.filter(is_active=True).count()}")
     print("=" * 60)
 

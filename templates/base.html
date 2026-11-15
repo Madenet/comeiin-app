@@ -34,7 +34,7 @@
   <meta name="apple-mobile-web-app-title" content="Comeiin">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=101" />
   <link rel="stylesheet" href="{% static 'css/future.css' %}?v=18" />
 
   <!-- OG -->
@@ -762,8 +762,8 @@
     window.CW_USER      = {% if user.is_authenticated %}{ id: {{ user.id }}, email: "{{ user.email|escapejs }}" }{% else %}null{% endif %};
   </script>
 
-  <script src="{% static 'js/catalogue.js' %}?v=100"></script>
-  <script src="{% static 'js/app.js' %}?v=10"></script>
+  <script src="{% static 'js/catalogue.js' %}?v=101"></script>
+  <script src="{% static 'js/app.js' %}?v=11"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="{% static 'js/vanta.net.min.js' %}"></script>
