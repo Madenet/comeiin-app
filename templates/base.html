@@ -762,7 +762,7 @@
     window.CW_USER      = {% if user.is_authenticated %}{ id: {{ user.id }}, email: "{{ user.email|escapejs }}" }{% else %}null{% endif %};
   </script>
 
-  <script src="{% static 'js/catalogue.js' %}?v=101"></script>
+  <script src="{% static 'js/catalogue.js' %}?v=102"></script>
   <script src="{% static 'js/app.js' %}?v=11"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>

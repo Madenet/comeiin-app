@@ -28,3 +28,11 @@ checks and the focused database import command. Batch images are approved;
 approval statuses for other images remain unchanged. catalogue.json is now the
 current source for the generated js/catalogue.js; run scripts/build_catalogue.py
 after changes. Additional views belong to individual products, not new SKUs.
+
+Approved catalogue batch 02 (15 November 2026): 20 approved images serve 20 new
+individual listings, bringing the catalogue to 57 entries. All 37 earlier entries
+remain unchanged. See docs/product-images/batch-02.txt for source details,
+image audit limitations, validation and deployment commands. The focused import
+now accepts batches 1 and 2; the initial seed applies both. Batches 03-06 still
+await client review. Approval of the displayed images does not verify unreadable
+fine print; listing specifications come from the catalogue text and layout.

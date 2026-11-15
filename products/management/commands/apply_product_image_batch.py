@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'Apply an approved product-image batch; preserves existing price, stock and visibility.'
 
     def add_arguments(self, parser):
-        parser.add_argument('batch', type=int, choices=[1])
+        parser.add_argument('batch', type=int, choices=[1, 2])
         parser.add_argument('--dry-run', action='store_true')
 
     def handle(self, *args, **options):
